@@ -1,0 +1,57 @@
+#cloud-config
+autoinstall:
+  version: 1
+  identity:
+    hostname: myuserhosts
+    password: "$6$zrcn2XyPBLV2y1lX$UAP0S/9M1ajo2UxJew8qzKpJMznAT.oZSGKBXciflbRWOognbS1Vgy8ZrKEoypBkRgYmO1eZg847z8YLO20fq1"
+    realname: Pankaj Chaurasia
+    username: myuser
+  locale: en_US.UTF-8
+  storage:
+    layout:
+      name: lvm
+# In case of static ip needed, uncomment this.
+# Bug: https://ubuntu.com/server/docs/install/autoinstall-reference#network
+#  network:
+#    network:
+#      version: 2
+#      renderer: networkd
+#      ethernets:
+#        ens33:
+#          dhcp4: no
+#          addresses:
+#            - 172.16.8.11/22
+#          gateway4: 172.16.8.1
+#          nameservers:
+#              addresses: [8.8.8.8, 1.1.1.1]
+  ssh:
+    install-server: true
+    allow-pw: false
+    authorized-keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCJMF9F5wRXEOJVVC1OoPSC5dqi1tj29J6VpgKWgWq+uKKr/+SiFwtd6DxlcfNueCoKnjc6qXy4B65RquhxOgUCnnnuXTn3rvbn7Wv7IsRLfDpsOKRq90XuTTHBsCkr7b/xZMBdpywRLQkMB6gMA83MtjpiQAqdpPxOY9nFiKkj7IOYzKm7jGBK9GvYXe+gFyJ3IdgBqGbwQShyWRA2ezGsBWY96H2R7l3BeBA7B8QbxylIjmPXslKfOnyNzU6KnddOGdJQNCqpyid2Lh+9G18HATqo+ApN45416aiPHKEAbvbq4o6TZPq0CbwN3esKyvELj/dog+DCtPxA/wBRSKp9 client@machine
+  packages:
+    - nfs-common
+    - iftop
+  user-data:
+    disable_root: false
+    timezone: Asia/Kolkata
+  late-commands:
+    - curtin in-target --target=/target -- umount cdrom/
+    - echo 'myuser ALL=(ALL) NOPASSWD:ALL' > /target/etc/sudoers.d/myuser
+    - echo 'Port 9222' >> /target/etc/ssh/sshd_config.d/myssh.conf
+    - echo 'AddressFamily inet' >> /target/etc/ssh/sshd_config.d/myssh.conf
+    - echo 'UsePAM no' >> /target/etc/ssh/sshd_config.d/myssh.conf
+    - sed -i 's/AcceptEnv/# AcceptEnv/' /target/etc/ssh/sshd_config
+    - echo 'set showmatch' >> /target/etc/vim/vimrc.local
+    - echo 'set ignorecase' >> /target/etc/vim/vimrc.local
+    - echo 'set mouse=a' >> /target/etc/vim/vimrc.local
+    - echo 'set autoindent' >> /target/etc/vim/vimrc.local
+    - echo 'set smartindent' >> /target/etc/vim/vimrc.local
+    - echo 'set setnumber' >> /target/etc/vim/vimrc.local
+    - sed -i 's/APT::Periodic::Update-Package-Lists "1"/APT::Periodic::Update-Package-Lists "0"/' /target/etc/apt/apt.conf.d/20auto-upgrades
+    - sed -i 's/APT::Periodic::Unattended-Upgrade "1"/APT::Periodic::Unattended-Upgrade "0"/' /target/etc/apt/apt.conf.d/20auto-upgrades
+    - rm -rf /target/root/snap
+    - rm -rf /target/snap
+    - rm -rf /target/var/lib/snapd
+    - rm -rf /target/var/snap
+    - reboot
