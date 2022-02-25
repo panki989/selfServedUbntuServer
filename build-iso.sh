@@ -16,7 +16,7 @@ apt-get install -y --no-install-recommends \
 
 pushd /opt
 if [[ ! -f 'ubuntu-20.04.2-live-server-amd64.iso' ]]; then
-    curl -fsSL -O http://releases.ubuntu.com/20.04/ubuntu-20.04.2-live-server-amd64.iso
+    curl -fsSL -O https://old-releases.ubuntu.com/releases/20.04/ubuntu-20.04.2-live-server-amd64.iso
 fi
 mkdir -p iso/nocloud/
 
